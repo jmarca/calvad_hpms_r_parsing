@@ -1,7 +1,7 @@
 config <- rcouchutils::get.config(Sys.getenv('RCOUCHUTILS_TEST_CONFIG'))
 year <- 2012
 
-fname <- c('./files/2012.csv','./files/2013.csv','./files/2011.csv)
+fname <- c('./files/2012.csv','./files/2013.csv','./files/2011.csv')
 
 
 test_that(
