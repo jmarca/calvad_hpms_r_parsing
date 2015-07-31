@@ -11,9 +11,13 @@
   "devDependencies": {
     "should": "^6.0.1"
   },
+  "rDependencies":{
+      "readr":"0.1.1.9000"
+  },
   "scripts": {
-      "test": "Rscript Rtest.R",
-      "install":"Rscript Rinstall.R"
+      "test": "/usr/bin/Rscript Rtest.R",
+      "preinstall": "/usr/bin/Rscript Requirements.R",
+      "install":"/usr/bin/Rscript Rinstall.R"
   },
   "repository": {
     "type": "git",
