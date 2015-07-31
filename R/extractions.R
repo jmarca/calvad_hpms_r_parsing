@@ -10,7 +10,7 @@ extract_numeric <- function(the_data){
     data_numeric <- the_data %>%
         dplyr::select(-Comments,-Value_Date,-Value_Text) %>%
         dplyr::filter( !is.na(Value_Numeric) & Value_Numeric != '') %>%
-        distinct %>%
+        dplyr::distinct %>%
         tidyr::spread(Data_Item,Value_Numeric)
 }
 

@@ -20,7 +20,7 @@ NULL
 ##' @param filename the path to the filename to parse
 ##' @return a list of data frames
 ##' @author James E. Marca
-##' @exports
+##' @export
 ##'
 parse_file <- function(filename){
     df <- read_file(filename)
