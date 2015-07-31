@@ -7,7 +7,19 @@
 ##' @return a data frame
 ##' @author James E. Marca
 ##'
-read_file <- function(filename){
-    the_data <- readr::read_csv(filename)
-    the_data
+read_file <- function(filename,delim=',',dt_format='%Y%.%m%.%d %H%.%M%.%S'){
+    coltypes <- list(
+        readr::col_double(),
+        readr::col_double(),
+        readr::col_character(),
+        readr::col_double(),
+        readr::col_double(),
+        readr::col_character(),
+        readr::col_double(),
+        readr::col_double(),
+        readr::col_character(),
+        readr::col_datetime(dt_format),
+        readr::col_character()
+    )
+    readr::read_delim(filename,delim,col_types=coltypes)
 }
