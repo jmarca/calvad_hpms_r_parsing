@@ -26,7 +26,7 @@ extract_numeric <- function(the_data){
 ##' @author James E. Marca
 ##'
 extract_date <- function(the_data){
-    if(!is(the_data$Value_Date,'POSIXt')){
+    if(!methods::is(the_data$Value_Date,'POSIXt')){
         return (
 
                 ## if is string or not POSIXt, then also test for blank
