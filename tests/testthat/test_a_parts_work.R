@@ -99,7 +99,7 @@ test_that(
                        )
                      )
         dftx <- extract_text(df)
-        expect_equal(dim(dftx),c(26,6))
+        expect_equal(dim(dftx),c(35,6))
         expect_equal(names(dftx),
                      c( "Year_Record","State_Code","Route_ID",
                        "Begin_Point","End_Point",
@@ -107,16 +107,22 @@ test_that(
                        )
                      )
         dfc <- extract_comments(df)
-        expect_equal(dim(dfc),c(90,13))
+        expect_equal(dim(dfc),c(76,19))
         expect_equal(names(dfc),
                      c( "Year_Record","State_Code","Route_ID",
                        "Begin_Point","End_Point",
                        "AADT",
                        "COUNTY_CODE",
+                       "CRACKING_LENGTH",
                        "F_SYSTEM",
+                       "IRI",
                        "K_FACTOR",
                        "NHS",
                        "OWNERSHIP",
+                       "PSR",
+                       "RUTTING",
+                       "SURFACE_TYPE",
+                       "TERRAIN_TYPE",
                        "THROUGH_LANES",
                        "URBAN_CODE"
                        )

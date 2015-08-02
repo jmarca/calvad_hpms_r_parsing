@@ -26,25 +26,25 @@ extract_numeric <- function(the_data){
 ##' @author James E. Marca
 ##'
 extract_date <- function(the_data){
-    if(!is(df$Value_Date,'POSIXt')){
+    if(!is(the_data$Value_Date,'POSIXt')){
         return (
-            the_data %>%
-                dplyr::select(-Section_Length,-Comments,
-                              -Value_Numeric,-Value_Text) %>%
 
                 ## if is string or not POSIXt, then also test for blank
 
+            the_data %>%
+                dplyr::select(-Section_Length,-Comments,
+                              -Value_Numeric,-Value_Text) %>%
                 dplyr::filter( !is.na(Value_Date) & Value_Date != '' ) %>%
                 tidyr::spread(Data_Item,Value_Date)
         )
     }else{
         return (
-            the_data %>%
-                dplyr::select(-Section_Length,-Comments,
-                              -Value_Numeric,-Value_Text) %>%
 
                 ## if is POSIXt, then all blank become NA during loading
 
+            the_data %>%
+                dplyr::select(-Section_Length,-Comments,
+                              -Value_Numeric,-Value_Text) %>%
                 dplyr::filter( !is.na(Value_Date) ) %>%
                 tidyr::spread(Data_Item,Value_Date)
         )
