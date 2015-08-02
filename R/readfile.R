@@ -11,17 +11,17 @@
 ##'
 read_file <- function(filename,delim=",",dt_format='%Y%.%m%.%d %H%.%M%.%S'){
     coltypes <- list(
-        readr::col_double(),
-        readr::col_double(),
-        readr::col_character(),
-        readr::col_double(),
-        readr::col_double(),
-        readr::col_character(),
-        readr::col_double(),
-        readr::col_double(),
-        readr::col_character(),
-        readr::col_datetime(dt_format),
-        readr::col_character()
+       'Year_Record'    = readr::col_double(),
+       'State_Code'     = readr::col_double(),
+       'Route_ID'       = readr::col_character(),
+       'Begin_Point'    = readr::col_double(),
+       'End_Point'      = readr::col_double(),
+       'Data_Item'      = readr::col_character(),
+       'Section_Length' = readr::col_double(),
+       'Value_Numeric'  = readr::col_double(),
+       'Value_Text'     = readr::col_character(),
+       'Value_Date'     = readr::col_datetime(dt_format),
+       'Comments'       = readr::col_character()
     )
     readr::read_delim(filename,delim,col_types=coltypes)
 }
