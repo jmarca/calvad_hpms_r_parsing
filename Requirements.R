@@ -1,22 +1,24 @@
 ## need node_modules directories
-dot_is <- getwd()
+dot_is <- paste(getwd(),'..',sep='/')
+print(dot_is)
+
 node_paths <- dir(dot_is,pattern='\\.Rlibs',
                   full.names=TRUE,recursive=TRUE,
                   ignore.case=TRUE,include.dirs=TRUE,
                   all.files = TRUE)
-path <- normalizePath(node_paths, winslash = "/", mustWork = FALSE)
+path <- normalizePath('../.Rlibs', winslash = "/", mustWork = FALSE)
+if(!file.exists('path')){
+    dir.create(path)
+}
 lib_paths <- .libPaths()
-.libPaths(c(path, lib_paths))
+.libPaths(c(path,node_paths, lib_paths))
 
 ## ideally I would plumb versions from package.json environment variables?
 
 envrr <- Sys.getenv()
-print(envrr)
 dependencies <- grep(pattern='npm_package_rDependencies'
                     ,x=names(envrr),perl=TRUE,value=TRUE)
-print(dependencies)
 pkgs <- strsplit(x=dependencies,split='npm_package_rDependencies_')
-print(pkgs)
 for(i in 1:length(dependencies)){
     pkg <- pkgs[[i]][2]
     ver <- envrr[[dependencies[i]]]
