@@ -22,8 +22,8 @@ NULL
 ##' @author James E. Marca
 ##' @export
 ##'
-parse_file <- function(filename){
-    df <- read_file(filename)
+parse_file <- function(filename,...){
+    df <- read_file(filename,...)
     df <- whitespace_fix(df)
     dfn <- extract_numeric(df)
     dfdt <- extract_date(df)
