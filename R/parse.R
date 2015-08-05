@@ -107,5 +107,8 @@ save_and_tweak_hpms_data <- function(df,config,con,tablename='hpms_subset'){
     my_tbl <- dplyr::tbl(src=sqlsrc,tablename)
     reappend <- dplyr::db_insert_into(con=con,table=tablename,values=df)
     my_tbl <- dplyr::tbl(src=sqlsrc,tablename)
-
+    if(missing(con)){
+        dbDisconnect(con)
+    }
+    my_tbl
 }

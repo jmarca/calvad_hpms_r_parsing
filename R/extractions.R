@@ -28,10 +28,19 @@ is_keeper <-  c(
 text_clean <- function(textvals){
 
     ## first get rid of all NA values
-    idx_notna <- !is.na(textvals)
+    na_idx <- is.na(textvals)
+    empty_idx <- textvals == ''
+    idx_notna <- !(na_idx | empty_idx)
+
     if(any(idx_notna)){
         if(length(idx_notna[idx_notna]) > 1){
-            print(paste('warning, multiple values for text field',len[idx_notna[idx_notna]]))
+
+            print(table(!na_idx))
+            print(table(!empty_idx))
+
+            print(paste('combining',length(idx_notna[idx_notna]),'values for text field',
+                        ))
+            print(paste(textvals[idx_notna]))
         }
         return (paste(textvals[idx_notna],collapse='; '))
     }else{
