@@ -1,4 +1,6 @@
-## need to lod config for psql params
+require('RPostgreSQL')
+
+## need to load config for psql params
 config_file <- Sys.getenv('R_CONFIG')
 
 if(config_file ==  ''){
@@ -8,11 +10,21 @@ print(paste ('using config file =',config_file))
 configurator <- configr::configrr()
 config <-  configurator(config_file)
 
+m <- dbDriver("PostgreSQL")
+con <-  dbConnect(m
+                 ,user=config$postgresql$auth$username
+                 ,host=config$postgresql$host
+                 ,dbname=config$postgresql$hpmsdb)
+
 fname <- c('./files/2011.csv'
           ,'./files/2012.csv'
           ,'./files/2013.csv')
 
+testtable <- 'test_sql_save'
 
+suppressWarnings(
+    dplyr::db_drop_table(con=con,table=testtable)
+)
 
 test_that(
     'can write sql',
@@ -23,7 +35,7 @@ test_that(
         df_spread <- grouped_extract(df)
         res <- save_and_tweak_hpms_data(df=df_spread,
                                         config=config,
-                                        tablename='deleteme')
+                                        tablename=testtable)
 
         sqlsrc <-  dplyr::src_postgres(dbname=config$postgresql$hpmsdb,
                                        host=config$postgresql$host,
@@ -37,3 +49,7 @@ test_that(
         expect_equal(qres,zres)
 
     })
+
+suppressWarnings(
+    dplyr::db_drop_table(con=con,table=testtable)
+)
