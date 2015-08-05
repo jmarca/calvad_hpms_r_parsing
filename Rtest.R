@@ -12,7 +12,7 @@ pkg <- devtools::as.package('.')
 ns_env <- devtools::load_all(pkg,quiet = TRUE)$env
 
 ## need env for test file
-Sys.setenv(RCOUCHUTILS_TEST_CONFIG=paste(dot_is,'test.config.json',sep='/'))
+Sys.setenv(R_CONFIG=paste(dot_is,'test.config.json',sep='/'))
 
 ## devtools::check()
 devtools::test()

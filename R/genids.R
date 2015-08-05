@@ -9,6 +9,10 @@
 ##' @export
 ##'
 canonical_routeid <- function(the_data){
-    leftpad <- max(stringr::str_length(the_data$Route_ID))
-    stringr::str_pad(the_data$Route_ID,side='left',pad='0',width=leftpad)
+    route_var_idx <- grepl(pattern="^route_id$",
+                           x=names(the_data),
+                           perl=TRUE,ignore.case=TRUE)
+    route_var <- names(the_data)[route_var_idx]
+    leftpad <- max(stringr::str_length(the_data[[route_var]]))
+    stringr::str_pad(the_data[[route_var]],side='left',pad='0',width=leftpad)
 }
