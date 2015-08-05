@@ -25,17 +25,7 @@ NULL
 parse_file_grouped_extract <- function(filename,...){
     df <- read_file(filename,...)
     df <- whitespace_fix(df)
-    dfn <- extract_numeric(df)
-    dfdt <- extract_date(df)
-    dftx <- extract_text(df)
-    dfc <- extract_comments(df)
-
-    ## don't recombine here.  Will produce loads of NA values if I do
-    list('data_numeric'=dfn,
-         'data_date'=dfdt,
-         'data_text'=dftx,
-         'data_comments'=dfc
-         )
+    grouped_extract(df)
 }
 
 ##' Parse a CSV HPMS data file, return lists of numeric,text,date,comments
