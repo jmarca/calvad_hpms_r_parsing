@@ -19,6 +19,7 @@ test_that(
                           'data_date',
                           'data_text',
                           'data_comments')))
+
     })
 test_that(
     'can load (some) of csv file for 2012',
@@ -53,4 +54,24 @@ test_that(
                           'data_date',
                           'data_text',
                           'data_comments')))
+        expect_equal(names(result$data_comments),
+                     c( "Year_Record","State_Code","Route_ID",
+                       "Begin_Point","End_Point",
+                       "AADT",
+                       "COUNTY_CODE",
+                       "CRACKING_LENGTH",
+                       "F_SYSTEM",
+                       "IRI",
+                       "K_FACTOR",
+                       "NHS",
+                       "OWNERSHIP",
+                       "PSR",
+                       "RUTTING",
+                       "SURFACE_TYPE",
+                       "TERRAIN_TYPE",
+                       "THROUGH_LANES",
+                       "URBAN_CODE"
+                       )
+                     )
+
     })

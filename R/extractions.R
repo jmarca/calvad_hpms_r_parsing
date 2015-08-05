@@ -16,6 +16,86 @@ extract_numeric <- function(the_data){
 }
 
 
+is_keeper <-  c(
+"AADT", "AADT_COMBINATION", "AADT_SINGLE_UNIT", "ACCESS_CONTROL",
+"ALTERNATIVE_ROUTE_NAME", "COUNTER_PEAK_LANES", "COUNTY_CODE", "DIR_FACTOR",
+"FACILITY_TYPE", "F_SYSTEM", "HOV_LANES", "HOV_TYPE", "IRI", "K_FACTOR",
+"LANE_WIDTH", "NHS", "OWNERSHIP", "PCT_PEAK_COMBINATION", "PCT_PEAK_SINGLE",
+"PEAK_LANES", "ROUTE_NUMBER", "ROUTE_QUALIFIER", "ROUTE_SIGNING", "SPEED_LIMIT",
+"THROUGH_LANES", "TRUCK", "URBAN_CODE", "YEAR_LAST_IMPROV"
+               )
+
+text_clean <- function(textvals){
+
+    ## first get rid of all NA values
+    idx_notna <- !is.na(textvals)
+    if(any(idx_notna)){
+        if(length(idx_notna[idx_notna]) > 1){
+            print(paste('warning, multiple values for text field',len[idx_notna[idx_notna]]))
+        }
+        return (paste(textvals[idx_notna],collapse='; '))
+    }else{
+        return ('')
+    }
+
+}
+
+##' Extract Values from HPMS CSV data
+##'
+##' @title extract_numeric
+##' @param the_data the data frame of data
+##' @return a data frame containing the "Data_Item", its "Value_Numeric",
+##'     and the identifying rows in the data
+##' @importFrom magrittr "%>%"
+##' @author James E. Marca
+##' @export
+##'
+grouped_extract <- function(the_data){
+
+    ## throwing in the towel for now.  Keep only the variables I care about
+    r3 <-
+        the_data %>%
+        dplyr::filter(Data_Item %in% is_keeper ) %>%
+        dplyr::group_by(Year_Record,
+                        State_Code,
+                        Route_ID,
+                        Begin_Point,
+                        End_Point,
+                        Data_Item) %>%
+        dplyr::summarise(num=max(Value_Numeric,na.rm=TRUE)
+                        ,txt=text_clean(Value_Text)
+                        ,cmt=text_clean(Comments)
+                         )
+
+    r4_n <- r3 %>%
+        dplyr::select(-txt,-cmt) %>%
+        dplyr::filter(!is.na(num)) %>%
+        tidyr::spread(Data_Item,num)
+
+    r4_t <- r3 %>%
+        dplyr::select(-num,-cmt) %>%
+        dplyr::filter(txt !=  '' & !is.na(txt)) %>%
+        tidyr::spread(Data_Item,txt)
+    varlen <- length(names(r4_t))
+    if(varlen >5){
+        names(r4_t)[6:varlen] <- paste(names(r4_t)[6:varlen],'txt',sep='_')
+    }
+    r4_c <- r3 %>%
+        dplyr::select(-num,-txt) %>%
+        dplyr::filter(cmt !=  '' & !is.na(cmt)) %>%
+        tidyr::spread(Data_Item,cmt)
+    varlen <- length(names(r4_c))
+    if(varlen >5){
+        names(r4_c)[6:varlen] <- paste(names(r4_c)[6:varlen],'cmt',sep='_')
+    }
+    ## recombine
+    r5 <- dplyr::full_join(r4_t,r4_c)
+    r6 <- dplyr::full_join(r4_n,r5)
+    r6
+
+}
+
+
 ##' Extract date from HPMS CSV data
 ##'
 ##' @title extract_date
