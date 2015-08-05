@@ -22,8 +22,11 @@ fname <- c('./files/2011.csv'
 
 testtable <- 'test_sql_save'
 
-suppressWarnings(
-    dplyr::db_drop_table(con=con,table=testtable)
+suppressMessages(
+    rs <- RPostgreSQL::dbSendQuery(
+        con,
+        paste('drop table if exists',testtable)
+        )
 )
 
 test_that(
@@ -50,6 +53,9 @@ test_that(
 
     })
 
-suppressWarnings(
-    dplyr::db_drop_table(con=con,table=testtable)
+suppressMessages(
+    rs <- RPostgreSQL::dbSendQuery(
+        con,
+        paste('drop table if exists',testtable)
+        )
 )
