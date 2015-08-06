@@ -86,8 +86,10 @@ save_and_tweak_hpms_data <- function(df,config,con,tablename='hpms_subset'){
                                    user=config$postgresql$user
                                    )
     names(df) <- stringr::str_to_lower(names(df))
-    df$route_id <- canonical_routeid(df)
-    ## df$id <- 1:length(df[,1])
+
+    ## nah, not useful really
+    ## df$route_id <- canonical_routeid(df)
+
     sqlhpms <- dplyr::copy_to(
         sqlsrc,df=df[1:2,],
         tablename,
