@@ -90,21 +90,27 @@ save_and_tweak_hpms_data <- function(df,config,con,tablename='hpms_subset'){
     ## nah, not useful really
     ## df$route_id <- canonical_routeid(df)
 
-    sqlhpms <- dplyr::copy_to(
-        sqlsrc,df=df[1:2,],
-        tablename,
-        temporary=FALSE
-    )
+    ## if the table does not exist, then write one row to initialize it
 
-    ## truncate that data, add serial column for PK
-    trunc_query <- paste( "truncate",tablename);
-    rs <- RPostgreSQL::dbSendQuery(con,trunc_query)
+    if( dplyr::db_has_table(con=con,table=tablename) ){
 
-    ## create a primary key index
+        sqlhpms <- dplyr::copy_to(
+            sqlsrc,df=df[1:2,],
+            tablename,
+            temporary=FALSE
+        )
 
-    pk_query <- paste("ALTER TABLE ONLY",tablename,
-                      "add column id serial primary key")
-    rs <- RPostgreSQL::dbSendQuery(con,pk_query)
+        ## truncate that data, add serial column for PK
+        trunc_query <- paste( "truncate",tablename);
+        rs <- RPostgreSQL::dbSendQuery(con,trunc_query)
+        ## create a primary key index
+
+        pk_query <- paste("ALTER TABLE ONLY",tablename,
+                          "add column id serial primary key")
+        rs <- RPostgreSQL::dbSendQuery(con,pk_query)
+    }
+
+    ## if the table and the data do not match up, then writing data will choke
 
     my_tbl <- dplyr::tbl(src=sqlsrc,tablename)
     reappend <- dplyr::db_insert_into(con=con,table=tablename,values=df)
