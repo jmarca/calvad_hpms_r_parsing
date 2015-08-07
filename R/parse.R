@@ -92,7 +92,7 @@ save_and_tweak_hpms_data <- function(df,config,con,tablename='hpms_subset'){
 
     ## if the table does not exist, then write one row to initialize it
 
-    if( dplyr::db_has_table(con=con,table=tablename) ){
+    if( !dplyr::db_has_table(con=con,table=tablename) ){
 
         sqlhpms <- dplyr::copy_to(
             sqlsrc,df=df[1:2,],

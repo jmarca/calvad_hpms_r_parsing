@@ -34,3 +34,15 @@ are "under" the wider spans 62.08 to 63.59, and then 63.59 to
 64.10. Within these spans, characteristics like "Ownership", "Lanes"
 and other values (not shown) change, while "F-System" and
 "Facility-Type" do not.
+
+
+# Reworking
+
+So in order to fix the above issues, rework to just pull out some
+data, and to try to merge together a single record per segment.
+
+One issue that needs to be fixed eventually is that the current
+code cannot append data.  That is, if the database exists with, say,
+2011 data, then adding 2012 data will cause an error because there are
+inconsistent columns, due to the fact that there are inconsistent
+"value" variables from year to year.

@@ -45,13 +45,39 @@ test_that(
                                        port=config$postgresql$port,
                                        user=config$postgresql$user
                                        )
-        my_tbl <- dplyr::tbl(src=sqlsrc,'deleteme')
+        my_tbl <- dplyr::tbl(src=sqlsrc,testtable)
 
         qres <- dplyr::collect(my_tbl)
         zres <- dplyr::collect(res)
         expect_equal(qres,zres)
 
     })
+
+
+## test fails, I actually CANNOT append data!
+## test_that(
+##     'can append sql',
+##     {
+##         filename <-  fname[1]
+##         df <- read_file(filename)
+##         df <- whitespace_fix(df)
+##         df_spread <- grouped_extract(df)
+##         res <- save_and_tweak_hpms_data(df=df_spread,
+##                                         config=config,
+##                                         tablename=testtable)
+
+##         sqlsrc <-  dplyr::src_postgres(dbname=config$postgresql$hpmsdb,
+##                                        host=config$postgresql$host,
+##                                        port=config$postgresql$port,
+##                                        user=config$postgresql$user
+##                                        )
+##         my_tbl <- dplyr::tbl(src=sqlsrc,testtable)
+
+##         qres <- dplyr::collect(my_tbl)
+##         zres <- dplyr::collect(res)
+##         expect_equal(qres,zres)
+
+##     })
 
 suppressMessages(
     rs <- RPostgreSQL::dbSendQuery(
