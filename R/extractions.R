@@ -87,7 +87,7 @@ grouped_extract <- function(the_data){
         tidyr::spread(Data_Item,num)
 
     r4_t <- r3 %>%
-        dplyr::select(-num,-cmt) %>%
+        dplyr::select(-Section_Length,-num,-cmt) %>%
         dplyr::filter(txt !=  '' & !is.na(txt)) %>%
         tidyr::spread(Data_Item,txt)
     varlen <- length(names(r4_t))
@@ -95,7 +95,7 @@ grouped_extract <- function(the_data){
         names(r4_t)[6:varlen] <- paste(names(r4_t)[6:varlen],'txt',sep='_')
     }
     r4_c <- r3 %>%
-        dplyr::select(-num,-txt) %>%
+        dplyr::select(-Section_Length,-num,-txt) %>%
         dplyr::filter(cmt !=  '' & !is.na(cmt)) %>%
         tidyr::spread(Data_Item,cmt)
     varlen <- length(names(r4_c))
