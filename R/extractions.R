@@ -75,7 +75,11 @@ grouped_extract <- function(the_data){
                         ,txt=text_clean(Value_Text)
                         ,cmt=text_clean(Comments)
                          )
-    r3$Section_Length[is.na(r3$Section_Length)] <- r3$End_Point - r3$Begin_Point
+    short_idx <- is.na(r3$Section_Length)
+    if(any(short_idx)){
+        r3$Section_Length[short_idx] <-
+            r3$End_Point[short_idx] - r3$Begin_Point[short_idx]
+    }
 
     r4_n <- r3 %>%
         dplyr::select(-txt,-cmt) %>%
