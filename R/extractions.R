@@ -62,8 +62,7 @@ text_clean <- function(textvals){
 grouped_extract <- function(the_data){
 
     ## throwing in the towel for now.  Keep only the variables I care about
-    r3 <-
-        the_data %>%
+    r3 <- the_data %>%
         dplyr::filter(Data_Item %in% is_keeper ) %>%
         dplyr::group_by(Year_Record,
                         State_Code,
@@ -71,10 +70,12 @@ grouped_extract <- function(the_data){
                         Begin_Point,
                         End_Point,
                         Data_Item) %>%
-        dplyr::summarise(num=max(Value_Numeric,na.rm=TRUE)
+        dplyr::summarise(Section_Length=max(Section_Length,na.rm=TRUE)
+                        ,num=max(Value_Numeric,na.rm=TRUE)
                         ,txt=text_clean(Value_Text)
                         ,cmt=text_clean(Comments)
                          )
+    r3$Section_Length[is.na(r3$Section_Length)] <- r3$End_Point - r3$Begin_Point
 
     r4_n <- r3 %>%
         dplyr::select(-txt,-cmt) %>%
