@@ -24,7 +24,15 @@ is_keeper <-  c(
 "PEAK_LANES", "ROUTE_NUMBER", "ROUTE_QUALIFIER", "ROUTE_SIGNING", "SPEED_LIMIT",
 "THROUGH_LANES", "TRUCK", "URBAN_CODE", "YEAR_LAST_IMPROV"
                )
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title text_clean
+##' @param textvals
+##' @return clean text
+##' @importFrom magrittr "%>%"
+##' @author James E. Marca
+##'
 text_clean <- function(textvals){
 
     ## first get rid of all NA values
@@ -47,6 +55,77 @@ text_clean <- function(textvals){
         return ('')
     }
 
+}
+
+common_vars <- c('Year_Record',
+                 'State_Code',
+                 'Route_ID',
+                 'Begin_Point',
+                 'End_Point')
+
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title state_machine
+##' @param records
+##' @return a df sliced to minimal begin_pt, end_pts
+##' @importFrom magrittr "%>%"
+##' @author James E. Marca
+##'
+state_machine <- function(records){
+
+    var_cols <- setdiff(names(records),
+                        c(common_vars,'Section_Length'))
+
+    newset <- NULL
+    sorted <- dplyr::arrange(records,Begin_Point)
+    states <- sorted$Begin_Point
+    for (i in 1:length(states)){
+        ## what is active now
+        active <- sorted$Begin_Point <= states[i] &
+            sorted$End_Point > states[i]
+        if(any(active) && length(active[active]>1)){
+            ## if smaller, nothing to do here
+            endpoint <- min(sorted$End_Point[active])
+            newrow <- sorted[i,common_vars]
+            newrow$End_Point <- endpoint
+            ## stop the overlap insanty!
+
+            ## fix section length too
+            newrow$Section_Length <- newrow$End_Point - newrow$Begin_Point
+
+            for(z in var_cols){
+                possibles <- sorted[active,][[z]]
+                na_idx <- is.na(possibles)
+                empty_idx <- possibles == ''
+
+                idx_something <- !( na_idx | empty_idx)
+
+                ## sql coalesce takes the first one.  check if unique?
+                if(any(idx_something)){
+                    possibleValue <- unique(possibles[idx_something])
+                    if(length(possibleValue)>1){
+                        print(paste('picking only the first of',
+                                    length(possibleValue),
+                                    'values for text field',
+                                    z
+                                    )
+                              )
+                        print(possibleValue)
+                    }
+                    newrow[z]=possibleValue[1]
+                }else{
+                    ## print(paste('nada',states[i],z))
+                }
+            }
+            if(is.null(newset)){
+                newset <- data.frame(newrow)
+            }else{
+                newset <- cbind(newset,newrow)
+            }
+        }
+    }
+    return(newset)
 }
 
 ##' Extract Values from HPMS CSV data
@@ -102,11 +181,21 @@ grouped_extract <- function(the_data){
     if(varlen >5){
         names(r4_c)[6:varlen] <- paste(names(r4_c)[6:varlen],'cmt',sep='_')
     }
+
+
     ## recombine
     r5 <- dplyr::full_join(r4_t,r4_c)
     r6 <- dplyr::full_join(r4_n,r5)
-    r6
 
+    ## do that hacky thing above to make each record consistent with
+    ## the "containing" records.  So if a record has a value
+
+    r7 <- r6 %>%
+        dplyr::group_by(Year_Record,
+                        State_Code,
+                        Route_ID) %>%
+        dplyr::do(state_machine(.))
+    r7
 }
 
 
