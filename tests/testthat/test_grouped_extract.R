@@ -13,8 +13,9 @@ test_that(
 
         dim_df_spread <- dim(df_spread)
         ## well what do I expect?
-        numrows <- dim(unique(df[,c('Route_ID','Begin_Point','End_Point')]))[1]
-        expect_equal(dim_df_spread,c(numrows,36))
+
+        expect_equal(dim_df_spread,c(36,37))
+        ## print(df_spread)
 
     })
 
@@ -29,7 +30,7 @@ test_that(
         dim_df_spread <- dim(df_spread)
         ## well what do I expect?
         numrows <- dim(unique(df[,c('Route_ID','Begin_Point','End_Point')]))[1]
-        expect_equal(dim_df_spread,c(numrows,27))
+        expect_equal(dim_df_spread,c(12,28))
     })
 
 test_that(
@@ -45,6 +46,6 @@ test_that(
         ## well what do I expect?
         numrows <- dim(unique(df[,c('Route_ID','Begin_Point','End_Point')]))[1]
         numcols <- length(intersect(unique(df$Data_Item),is_keeper))
-        expect_equal(dim_df_spread,c(numrows,37))
+        expect_equal(dim_df_spread,c(39,38))
 
     })

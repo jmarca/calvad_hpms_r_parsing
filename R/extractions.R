@@ -79,16 +79,23 @@ state_machine <- function(records){
 
     newset <- NULL
     sorted <- dplyr::arrange(records,Begin_Point)
-    states <- sorted$Begin_Point
+    states <- unique(sort(c(sorted$Begin_Point,sorted$End_Point)))
+
     for (i in 1:length(states)){
         ## what is active now
         active <- sorted$Begin_Point <= states[i] &
             sorted$End_Point > states[i]
         if(any(active) && length(active[active]>1)){
             ## if smaller, nothing to do here
+
+
+            newrow <- sorted[1,common_vars]
+
+            newrow$Begin_Point <- states[i]
+
             endpoint <- min(sorted$End_Point[active])
-            newrow <- sorted[i,common_vars]
             newrow$End_Point <- endpoint
+
             ## stop the overlap insanty!
 
             ## fix section length too
@@ -115,14 +122,10 @@ state_machine <- function(records){
                     }
                     newrow[z]=possibleValue[1]
                 }else{
-                    ## print(paste('nada',states[i],z))
+                    newrow[z]=NA
                 }
             }
-            if(is.null(newset)){
-                newset <- data.frame(newrow)
-            }else{
-                newset <- cbind(newset,newrow)
-            }
+            newset <- rbind(newset,newrow)
         }
     }
     return(newset)

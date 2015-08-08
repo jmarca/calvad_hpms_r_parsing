@@ -51,6 +51,8 @@ test_that(
         zres <- dplyr::collect(res)
         expect_equal(qres,zres)
 
+        rec_a03501 <- qres %>% dplyr::filter(route_id == '000000A03501')
+        expect_equal(dim(rec_a03501)[1],3)
     })
 
 
@@ -85,3 +87,5 @@ suppressMessages(
         paste('drop table if exists',testtable)
         )
 )
+
+RPostgreSQL::dbDisconnect(con)
