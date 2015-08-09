@@ -270,6 +270,13 @@ grouped_extract <- function(the_data){
                         State_Code,
                         Route_ID) %>%
         dplyr::do(state_machine(.))
+
+    ## missing_columns <- setdiff(c(common_vars,
+    ##                              paste(is_keeper,'txt',sep='_')
+    ##                              paste(is_keeper,'cmt',sep='_')
+    ##                             ,names(r7))
+    ## r7[,missing_columns] <- NA
+
     r7
 }
 
