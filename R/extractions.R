@@ -63,9 +63,72 @@ common_vars <- c('Year_Record',
                  'Begin_Point',
                  'End_Point')
 
-##' .. content for \description{} (no empty lines) ..
+##' A state machine to merge and rationalize the passed in records.
 ##'
-##' .. content for \details{} ..
+##' The problem with the HPMS data as recorded is that it contains
+##' overlapping records, and many times the overlapping data is not
+##' repeated in other records.  For example
+##'
+##' ```
+##' Rec   Route_ID Begin_Point End_Point  AADT OWNERSHIP F_SYSTEM FACILITY_TYPE THROUGH_LANES
+##'  1     18001       62.08     62.94    NA         4       NA            NA            NA
+##'  2     18001       62.08     62.94    NA        NA       NA            NA            NA
+##'  3     18001       62.08     63.59 24637        NA        3             2            NA
+##'  4     18001       62.94     63.44    NA         2       NA            NA             2
+##'  5     18001       62.94     63.44    NA        NA       NA            NA            NA
+##'  6     18001       63.44     63.59    NA         4       NA            NA            NA
+##'  7     18001       63.44     63.59    NA         4       NA            NA             2
+##'  8     18001       63.59     64.10    NA         4       NA            NA             4
+##'  9     18001       63.59     64.10    NA         4       NA            NA            NA
+##' 10     18001       63.59     64.10 35250        NA        3             2             2
+##'
+##' ```
+##'
+##' If you notice, the entire section, from 62.08 through 64.10 has an
+##' AADT value.  However, several sections have NA assigned because they
+##' are "under" the wider spans 62.08 to 63.59, and then 63.59 to
+##' 64.10. Within these spans, characteristics like "Ownership", "Lanes"
+##' and other values (not shown) change, while "F-System" and
+##' "Facility-Type" do not.
+##'
+##' Looking at it another way:
+##'
+##' Rec         Section Covered
+##'     +---------+---------+-----+--------+
+##'  1  |---------|
+##'  2  |---------|
+##'  3  |-------------------------|
+##'  4            |---------|
+##'  5            |---------|
+##'  6                      |-----|
+##'  7                      |-----|
+##'  8                            |--------|
+##'  8                            |--------|
+##' 10                            |--------|
+##'     +---------+---------+-----+--------+
+##'     A         B         C     D        E
+##'   62.08     62.94     63.44 63.59    64.10
+##'
+##' This routine will step through the passed in records and create
+##' the edge on view, looking *up* at the above diagram.  So for the
+##' section from 62.08, it will merge records 1, 2, and 3.  From B to
+##' C will merge records 3, 4, and 5.  From C to D will merge 3, 6,
+##' and 7.  And finally section D to E will merge records 8, 9, and
+##' 10.
+##'
+##'
+##' Note that I *hate* this code.  It feels very much *not* in a
+##' proper R idiom, rather in a more loopy language.  I feel like
+##' there should be some way to organize this in terms of lists etc,
+##' but I can't see it, and this does the job for now (albeit super
+##' slowly)
+##'
+##' One thing to keep in mind is due to how dplyr::do works, every
+##' group of records must return at least one row.  So that means a
+##' record with start point equal to end point will produce a null
+##' output here, and so you have to get rid of those *before* calling
+##' this routine.
+##'
 ##' @title state_machine
 ##' @param records
 ##' @return a df sliced to minimal begin_pt, end_pts
@@ -128,7 +191,13 @@ state_machine <- function(records){
             newset <- rbind(newset,newrow)
         }
     }
-    return(newset)
+    if(is.data.frame(newset)){
+        return(newset)
+    }else{
+        print('not a data frame')
+        print(records)
+        return(NULL)
+    }
 }
 
 ##' Extract Values from HPMS CSV data
@@ -144,8 +213,11 @@ state_machine <- function(records){
 grouped_extract <- function(the_data){
 
     ## throwing in the towel for now.  Keep only the variables I care about
+
+    ## also note that the Begin_Point != End_Point filter is required
+    ## for the state_machine code
     r3 <- the_data %>%
-        dplyr::filter(Data_Item %in% is_keeper ) %>%
+        dplyr::filter(Data_Item %in% is_keeper & Begin_Point != End_Point) %>%
         dplyr::group_by(Year_Record,
                         State_Code,
                         Route_ID,
